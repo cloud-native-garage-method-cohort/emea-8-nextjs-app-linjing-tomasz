@@ -10,55 +10,54 @@ spec:
     bindings:
     - ref: webhook-receiver
 ---
-
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: webhook-receiver
+spec:
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: next-js-
+    spec:
+      serviceAccountName: build-bot
+      params:
+        - name: source-repo
+          value: https://github.com/cloud-native-garage-method-cohort/emea-8-nextjs-app-linjing-tomasz.git
+        - name: image-repo
+          value: quay.io/fu_linjing/next-app
+        - name: app-name
+          value: next-js-app
+      pipelineRef:
+        name: nextjs-e2e-pipeline
+      workspaces:
+        - name: pipeline-shared-data
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 1Gi
+              accessModes:
+                - ReadWriteOnce
+        - name: gitops-repository
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 1Gi
+              accessModes:
+              - ReadWriteOnce
+        - name: git-credentials
+          secret:
+            secretName: git-credentials
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: webhook-receiver
-spec:
-  params:
-  - name: source-repo
-    value: $(body.repository.url)
-  - name: sha
-    value: $(body.head_commit.id)
 ---
-apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
-metadata:
-  generateName: next-js-
-spec:
-  serviceAccountName: build-bot
-  params:
-    - name: source-repo
-      value: https://github.com/cloud-native-garage-method-cohort/emea-8-nextjs-app-linjing-tomasz.git
-    - name: image-repo
-      value: quay.io/fu_linjing/next-app
-    - name: app-name
-      value: next-js-app
-  pipelineRef:
-    name: nextjs-e2e-pipeline
-  workspaces:
-    - name: pipeline-shared-data
-      volumeClaimTemplate:
-        spec:
-          resources:
-            requests:
-              storage: 1Gi
-          accessModes:
-            - ReadWriteOnce
-    - name: gitops-repository
-      volumeClaimTemplate:
-        spec:
-          resources:
-            requests:
-              storage: 1Gi
-          accessModes:
-          - ReadWriteOnce
-    - name: git-credentials
-      secret:
-        secretName: git-credentials
----
+
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

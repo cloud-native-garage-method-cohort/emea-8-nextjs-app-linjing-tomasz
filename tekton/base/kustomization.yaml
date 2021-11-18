@@ -5,6 +5,9 @@ resources:
 - build-bot.ServiceAccount.yaml
 - create-configuration.yaml
 - deploy.Task.yaml
-- image-build.pipeline.yaml
-- quay-io-credentials.secrect.yaml
 - nextjs.pipeline.yaml
+- git-credentials.secret.yaml
+- production-repository.ConfigMap.yaml
+- quay-io-credentials.secret.yaml
+- save-configuration.yaml
+- webhook-trigger.EventListener.yaml
